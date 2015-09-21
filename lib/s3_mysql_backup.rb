@@ -2,6 +2,7 @@ require "net/smtp"
 require "time"
 require 'fileutils'
 require 'yaml'
+require 'erb'
 
 require File.dirname(__FILE__) + '/s3utils'
 
@@ -35,7 +36,8 @@ class S3MysqlBackup
     }
 
     if @s3config.nil?
-      @s3config = @path_to_config.is_a?(Hash) ? defaults.merge(stringify_keys(@path_to_config)) : defaults.merge(YAML::load_file(@path_to_config))
+      # @s3config = @path_to_config.is_a?(Hash) ? defaults.merge(stringify_keys(@path_to_config)) : defaults.merge(YAML::load_file(@path_to_config))
+      @s3config = @path_to_config.is_a?(Hash) ? defaults.merge(stringify_keys(@path_to_config)) : defaults.merge(YAML.load(ERB.new(File.read(@path_to_config)).result))
 
       # Backcompat for gmail_* keys
       @s3config.keys.each do |key|
